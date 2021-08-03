@@ -14,7 +14,25 @@ class UserController extends Controller{
         if($user->clave != $password){
             echo "Not Matched";
         }else{
-           echo $user->nom_usuario;
+            $doctor = DB::table('doctores')->where('id_doctor',$user->id_doctor)->get();
+            echo json_encode($doctor[0]);
         }
+    }
+
+    function consultaDoctor(Request $req){
+        $doctor = $req->input('doctor');
+        $doctor = intval($doctor);
+
+        $consultas = DB::table('consultas')->where('id_doctor',$doctor)->get();
+
+        echo $consultas;
+
+        echo "\n";
+
+        echo json_encode($consultas);
+
+        /*foreach ($consultas as $key => $value) {
+            echo "{$value->id_doctor} {$value->especialidad} {$value->paciente} \n";
+        }*/
     }
 }
