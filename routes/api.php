@@ -22,4 +22,4 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::post('/login',[UserController::class,'login']);
 
-Route::post('/consultas',[UserController::class,'consultaDoctor']);
+Route::post('/consultadoctor',[UserController::class,'consultaDoctor']);

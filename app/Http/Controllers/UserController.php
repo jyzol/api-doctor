@@ -25,9 +25,9 @@ class UserController extends Controller{
 
         $consultas = DB::table('consultas')->where('id_doctor',$doctor)->get();
 
-        echo $consultas;
+        //echo $consultas;
 
-        echo "\n";
+        //echo "\n";
 
         echo json_encode($consultas);
 
