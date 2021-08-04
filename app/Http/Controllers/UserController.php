@@ -54,31 +54,101 @@ class UserController extends Controller{
     public function listConsultaFiltros(Request $req){
         $tipoPaciente = $req->input('tipoPac');
         $tipoConsulta = $req->input('tipoCons');
+        $tipoEstado = $req->input('tipoEst');
         $finicio = $req->input('finicio');
         $ffin = $req->input('ffin');
         $doctor = $req->input('doctor');
         $doctor = intval($doctor);
 
         try {
-            if(!empty($tipoConsulta) && !empty($tipoPaciente) && !empty($finicio) && !empty($ffin)){
+            if(!empty($tipoPaciente) && !empty($tipoConsulta) && !empty($tipoEstado) && !empty($finicio) && !empty($ffin)){
+                $data = DB::table('consultas')
+                        ->where('id_doctor',$doctor)
+                        ->where('tipo_paciente',$tipoPaciente)
+                        ->where('tipo_atencion',$tipoConsulta)
+                        ->where('estado',$tipoEstado)
+                        ->whereBetween('fecha_atencion', [$finicio, $ffin])->get()->toArray();
+
+            }else if(!empty($tipoPaciente) && !empty($tipoConsulta) && !empty($tipoEstado)){//abc
+                $data = DB::table('consultas')
+                        ->where('id_doctor',$doctor)
+                        ->where('tipo_paciente',$tipoPaciente)
+                        ->where('tipo_atencion',$tipoConsulta)
+                        ->where('estado',$tipoEstado)->get()->toArray();
+
+            }else if(!empty($tipoPaciente) && !empty($tipoConsulta) && !empty($finicio) && !empty($ffin)){//abd
+                $data = DB::table('consultas')
+                        ->where('id_doctor',$doctor)
+                        ->where('tipo_paciente',$tipoPaciente)
+                        ->where('tipo_atencion',$tipoConsulta)
+                        ->whereBetween('fecha_atencion', [$finicio, $ffin])->get()->toArray();
+
+            }else if(!empty($tipoPaciente) && !empty($tipoEstado) && !empty($finicio) && !empty($ffin)){//acd
+                $data = DB::table('consultas')
+                        ->where('id_doctor',$doctor)
+                        ->where('tipo_paciente',$tipoPaciente)
+                        ->where('estado',$tipoEstado)
+                        ->whereBetween('fecha_atencion', [$finicio, $ffin])->get()->toArray();
+            
+            }else if(!empty($tipoConsulta) && !empty($tipoEstado) && !empty($finicio) && !empty($ffin)){//bcd
+                $data = DB::table('consultas')
+                        ->where('id_doctor',$doctor)
+                        ->where('tipo_atencion',$tipoConsulta)
+                        ->where('estado',$tipoEstado)
+                        ->whereBetween('fecha_atencion', [$finicio, $ffin])->get()->toArray();
+            
+            }else if(!empty($tipoPaciente) && !empty($tipoConsulta)){//ab
                 $data = DB::table('consultas')
                         ->where('id_doctor',$doctor)
                         ->where('tipo_paciente',$tipoPaciente)
                         ->where('tipo_atencion',$tipoConsulta)->get()->toArray();
-            }else if(!empty($tipoConsulta) && !empty($tipoPaciente)){
+            
+            }else if(!empty($tipoPaciente) && !empty($tipoEstado)){//ac
                 $data = DB::table('consultas')
                         ->where('id_doctor',$doctor)
                         ->where('tipo_paciente',$tipoPaciente)
-                        ->where('tipo_atencion',$tipoConsulta)->get()->toArray();
-            }else if(!empty($tipoPaciente)){
+                        ->where('estado',$tipoEstado)->get()->toArray();
+            
+            }else if(!empty($tipoPaciente) && !empty($finicio) && !empty($ffin)){//ad
+                $data = DB::table('consultas')
+                        ->where('id_doctor',$doctor)
+                        ->where('tipo_paciente',$tipoPaciente)
+                        ->whereBetween('fecha_atencion', [$finicio, $ffin])->get()->toArray();
+
+            }else if(!empty($tipoConsulta) && !empty($tipoEstado)){//bc
+                $data = DB::table('consultas')
+                        ->where('id_doctor',$doctor)
+                        ->where('tipo_atencion',$tipoConsulta)
+                        ->where('estado',$tipoEstado)->get()->toArray();
+
+            }else if(!empty($tipoConsulta) && !empty($finicio) && !empty($ffin)){//bd
+                $data = DB::table('consultas')
+                        ->where('id_doctor',$doctor)
+                        ->where('tipo_atencion',$tipoConsulta)
+                        ->whereBetween('fecha_atencion', [$finicio, $ffin])->get()->toArray();
+
+            }else if(!empty($tipoEstado) && !empty($finicio) && !empty($ffin)){//cd
+                $data = DB::table('consultas')
+                        ->where('id_doctor',$doctor)
+                        ->where('estado',$tipoEstado)
+                        ->whereBetween('fecha_atencion', [$finicio, $ffin])->get()->toArray();
+
+            }else if(!empty($tipoPaciente)){//a
                 $data = DB::table('consultas')
                         ->where('id_doctor',$doctor)
                         ->where('tipo_paciente',$tipoPaciente)->get()->toArray();
-            }else if(!empty($tipoConsulta)){
+
+            }else if(!empty($tipoConsulta)){//b
                 $data = DB::table('consultas')
                         ->where('id_doctor',$doctor)
                         ->where('tipo_atencion',$tipoConsulta)->get()->toArray();
-            }else if(!empty($finicio) && !empty($ffin)){
+            
+            }else if(!empty($tipoEstado)){//c
+                $data = DB::table('consultas')
+                        ->where('id_doctor',$doctor)
+                        ->where('estado',$tipoEstado)->get()->toArray();
+
+            }else if(!empty($finicio) && !empty($ffin)){//d
                 $data = DB::table('consultas')
                         ->where('id_doctor',$doctor)
                         ->whereBetween('fecha_atencion', [$finicio, $ffin])->get()->toArray();
@@ -86,6 +156,15 @@ class UserController extends Controller{
                 $data = DB::table('consultas')
                         ->where('id_doctor',$doctor)->get()->toArray();
             }
+
+            /*
+
+            $data = DB::table('consultas')
+                        ->where('id_doctor',$doctor)
+                        ->where('tipo_paciente',$tipoPaciente)
+                        ->where('tipo_estado',$tipoEstado)
+                        ->where('tipo_atencion',$tipoConsulta)->get()->toArray();
+            */
             
             //$data = DB::select("SELECT * FROM consultas WHERE tipo_paciente='$tipoPaciente' AND id_doctor='$doctor'" );
             //$response['data']=$data;
