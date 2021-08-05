@@ -176,4 +176,17 @@ class UserController extends Controller{
         }
         return json_encode($data);
     }
+    public function registrar(Request $req){
+        $ruc =  $req->input('ruc');
+        $concepto = $req->input('concepto');
+        $clavesol = $req->input('clavesol');
+        $pass = $req->input('pass');
+
+        DB::table('facturas')->insert([
+            'ruc' => $ruc,
+            'concepto' => $concepto,
+            'fec_emision'=> CURRENT_TIMESTAMP,
+            'monto'=>'5000',
+        ]);
+    }
 }
