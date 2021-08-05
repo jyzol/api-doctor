@@ -282,7 +282,8 @@ class UserController extends Controller{
         $totales[0] = $montos[0] + $montos[1];
         $totales[1] = $montos[2] + $montos[3];
         $totales[2] = $montos[4] + $montos[5];
-        
+
+        $total = array_sum($totales);
         /*print_r($cantidades);
         echo "\n";
         print_r($montos);
@@ -292,7 +293,8 @@ class UserController extends Controller{
         return response()->json(['success' => true,
                                 'cantidades' => $cantidades,
                                 'montos' => $montos,
-                                'totales' => $totales],
+                                'totales' => $totales,
+                                'total' => $total],
                                 200);
         //return json_encode($cantidades);
         //return json_encode($data);
