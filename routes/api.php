@@ -21,8 +21,10 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 
 Route::post('/login',[UserController::class,'login']);
+Route::post('/registrar',[UserController::class,'registrar']);
+Route::post('/actruc',[UserController::class,'actruc']);
 Route::get('/listar',[UserController::class,'listConsulta']);
 Route::get('/filtros',[UserController::class,'listConsultaFiltros']);
-Route::post('/registrar',[UserController::class,'registrar']);
+Route::post('/registrofact',[UserController::class,'registroFactura']);
 Route::get('/montos',[UserController::class,'listMontos']);
 Route::get('/facturas',[UserController::class,'listFacturas']);

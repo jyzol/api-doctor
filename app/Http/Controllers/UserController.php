@@ -19,6 +19,69 @@ class UserController extends Controller{
         }
     }
 
+    function registrar(Request $req){
+        $nombres =  $req->input('nombres');
+        $appat = $req->input('appat');
+        $apmat = $req->input('apmat');
+        $dni = $req->input('dni');
+        $correo = $req->input('correo');
+        $telefono = $req->input('telefono');
+        $direccion = $req->input('direccion');
+        $especialidad = $req->input('especialidad');
+        $ruc = $req->input('ruc');
+        $clavesol = $req->input('clavesol');
+        $solpass = $req->input('solpass');
+        $usuario = $req->input('usuario');
+        $pass = $req->input('pass');
+
+        try {
+            $id = DB::table('doctores')->insertGetId([
+                'nombres' => $nombres,
+                'ap_pat' => $appat,
+                'ap_mat' => $apmat,
+                'correo' => $correo,
+                'telefono' => $telefono,
+                'direccion' => $direccion,
+                'especialidad' => $especialidad,
+                'dni' => $dni,
+                'ruc' => $ruc,
+                'clave_sol' => $clavesol,
+                'pass_sol' => $solpass
+            ]);
+
+            DB::table('usuarios')->insert([
+                'id_doctor' => $id,
+                'tipo_usuario' => 'personal',
+                'nom_usuario' => $usuario,
+                'clave' => $pass
+            ]);
+        } catch (\Exception $e) {
+            
+        }
+
+        echo 'Éxito';
+    }
+
+    function actruc(Request $req){
+        $ruc = $req->input('ruc');
+        $clavesol = $req->input('clavesol');
+        $solpass = $req->input('solpass');
+
+        try {
+            $affected = DB::table('doctores')
+                        ->where('ruc', $ruc)            
+                        ->update([
+                            'clave_sol' => $clavesol,
+                            'pass_sol' => $solpass
+                        ]);
+
+        } catch (\Exception $e) {
+            
+        }
+
+        echo $affected;
+    }
+
     function consultaDoctor(Request $req){
         $doctor = $req->input('doctor');
         $doctor = intval($doctor);
@@ -170,13 +233,21 @@ class UserController extends Controller{
                 $data = DB::table('consultas')
                         ->where('id_doctor',$doctor)->get()->toArray();
             }
+
+            $doctor = DB::table('doctores')->where('id_doctor',$doctor)->get();
         } catch (\Exception $e) {
             //$response['message']=$e->getMessage();
             //$response['success']= false;
         }
+
+
+        foreach ($data as $key => $value) {
+            $value->id = $key;
+            $value->nom_doctor = $doctor[0]->nombres ." ". $doctor[0]->ap_pat ." ". $doctor[0]->ap_mat;
+        }
         return json_encode($data);
     }
-    public function registrar(Request $req){
+    public function registroFactura(Request $req){
         $ruc =  $req->input('ruc');
         $concepto = $req->input('concepto');
         $clavesol = $req->input('clavesol');
