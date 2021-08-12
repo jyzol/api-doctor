@@ -4,11 +4,13 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Twilio\Rest\Client; 
 
 class UserController extends Controller{
     function login(Request $req){
         $username =  $req->input('userLogin');
         $password = $req->input('passLogin');
+
  
         $user = DB::table('usuarios')->where('nom_usuario',$username)->first();
         if($user->clave != $password){
@@ -18,6 +20,53 @@ class UserController extends Controller{
             echo json_encode($doctor[0]);
         }
     }
+
+    function getCode(Request $req){
+        $username =  $req->input('userLogin');
+        $phonenumber =  $req->input('phoneCode');
+        //$password = $req->input('passLogin');
+
+        $gen_pass = random_int(100000,999999);
+
+        $affected = DB::table('usuarios')->where('nom_usuario', $username)->update(['clave' => $gen_pass]);
+
+        if(!empty($affected)){
+            $sid    = "AC82aadf3a28748122a83188e1b06db1a3"; 
+            $token  = "7d2232355a3d5c10f1a9a665d5f6fc2b"; 
+            $twilio = new Client($sid, $token); 
+ 
+            $message = $twilio->messages 
+                            ->create("+51{$phonenumber}", // to 
+                                array(  
+                                    "messagingServiceSid" => "MGf4d520c578464cad5b933e4fc96afdfa",      
+                                "body" => "Clave de acceso para {$username}: {$gen_pass}"
+                            )
+                        );
+            print($message->sid);
+            print($phonenumber);
+            $usr = DB::table('usuarios')->where('nom_usuario',$username)->first();
+            echo json_encode($usr);
+        }else{
+            echo "error";
+        }
+    }
+
+    function logout(Request $req){
+        $id =  $req->input('idLogout');
+        //$password = $req->input('passLogin');
+
+        $gen_pass = random_int(100000,999999);
+
+        $affected = DB::table('usuarios')->where('id_doctor', $id)->update(['clave' => $gen_pass]);
+
+        if(!empty($affected)){
+            $usr = DB::table('usuarios')->where('id_doctor',$id)->first();
+            echo json_encode($usr);
+        }else{
+            echo "error";
+        }
+    }
+
 
     function registrar(Request $req){
         $nombres =  $req->input('nombres');
@@ -243,7 +292,8 @@ class UserController extends Controller{
 
         foreach ($data as $key => $value) {
             $value->id = $key;
-            $value->nom_doctor = $doctor[0]->nombres ." ". $doctor[0]->ap_pat ." ". $doctor[0]->ap_mat;
+            //$value->nom_doctor = $doctor[0]->nombres ." ". $doctor[0]->ap_pat ." ". $doctor[0]->ap_mat;
+            $value->nom_doctor = $doctor[0]->APELLIDOS_NOMBRES;
         }
         return json_encode($data);
     }
