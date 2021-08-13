@@ -31,14 +31,14 @@ class UserController extends Controller{
         $affected = DB::table('usuarios')->where('nom_usuario', $username)->update(['clave' => $gen_pass]);
 
         if(!empty($affected)){
-            $sid    = "AC82aadf3a28748122a83188e1b06db1a3"; 
-            $token  = "7d2232355a3d5c10f1a9a665d5f6fc2b"; 
+            $sid    = env('TWILIO_SID');
+            $token  = env('TWILIO_TOKEN'); 
             $twilio = new Client($sid, $token); 
  
             $message = $twilio->messages 
                             ->create("+51{$phonenumber}", // to 
                                 array(  
-                                    "messagingServiceSid" => "MGf4d520c578464cad5b933e4fc96afdfa",      
+                                    "messagingServiceSid" => env('TWILIO_MSID'),      
                                 "body" => "Clave de acceso para {$username}: {$gen_pass}"
                             )
                         );
