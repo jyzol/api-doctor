@@ -11,14 +11,23 @@ class UserController extends Controller{
         $username =  $req->input('userLogin');
         $password = $req->input('passLogin');
 
- 
-        $user = DB::table('usuarios')->where('nom_usuario',$username)->first();
-        if($user->clave != $password){
-            echo "Not Matched";
+        if(!empty($username)){
+            $user = DB::table('usuarios')->where('nom_usuario',$username)->first();
+            if(!empty($user)){
+                if($user->clave != $password){
+                    echo "Error";
+                }else{
+                    $doctor = DB::table('doctores')->where('id_doctor',$user->id_doctor)->get();
+                    echo json_encode($doctor[0]);
+                }
+            }else{
+                echo "Error";
+            }
+            
         }else{
-            $doctor = DB::table('doctores')->where('id_doctor',$user->id_doctor)->get();
-            echo json_encode($doctor[0]);
+            echo "Error";
         }
+        
     }
 
     function getCode(Request $req){
@@ -113,22 +122,25 @@ class UserController extends Controller{
 
     function actruc(Request $req){
         $ruc = $req->input('ruc');
-        $clavesol = $req->input('clavesol');
-        $solpass = $req->input('solpass');
+        $usuario_sunat = $req->input('usuariosunat');
+        $clave_sunat = $req->input('clavesunat');
 
         try {
             $affected = DB::table('doctores')
-                        ->where('ruc', $ruc)            
+                        ->where('RUC', $ruc)            
                         ->update([
-                            'clave_sol' => $clavesol,
-                            'pass_sol' => $solpass
+                            'USUARIO_SUNAT' => $usuario_sunat,
+                            'CLAVE_SUNAT' => $clave_sunat
                         ]);
-
         } catch (\Exception $e) {
-            
+            echo "Error";
         }
-
-        echo $affected;
+        if($affected!=0){
+            echo $affected;
+        }else{
+            echo "Error";
+        }
+        
     }
 
     function consultaDoctor(Request $req){
@@ -365,25 +377,25 @@ class UserController extends Controller{
                     ->where('id_doctor',$doctor)
                     ->where('estado','pendiente')
                     ->where('tipo_atencion','cita')
-                    ->where('tipo_paciente','seguro')->sum('monto');
+                    ->where('tipo_paciente','seguro')->sum('importe_total');
 
             $montos[1] = DB::table('consultas')
                     ->where('id_doctor',$doctor)
                     ->where('estado','pendiente')
                     ->where('tipo_atencion','cita')
-                    ->where('tipo_paciente','particular')->sum('monto');
+                    ->where('tipo_paciente','particular')->sum('importe_total');
 
             $montos[2] = DB::table('consultas')
                     ->where('id_doctor',$doctor)
                     ->where('estado','pendiente')
                     ->where('tipo_atencion','procedimiento')
-                    ->where('tipo_paciente','seguro')->sum('monto');
+                    ->where('tipo_paciente','seguro')->sum('importe_total');
 
             $montos[3] = DB::table('consultas')
                     ->where('id_doctor',$doctor)
                     ->where('estado','pendiente')
                     ->where('tipo_atencion','procedimiento')
-                    ->where('tipo_paciente','particular')->sum('monto');
+                    ->where('tipo_paciente','particular')->sum('importe_total');
             
             $montos[4] = DB::table('bonos')
                     ->where('id_doctor',$doctor)
