@@ -150,8 +150,15 @@ class UserController extends Controller{
         $consultas = DB::table('consultas')->where('id_doctor',$doctor)->get();
 
         //echo $consultas;
-
         //echo "\n";
+
+        $doc = DB::table('doctores')->where('id_doctor',$doctor)->get();
+
+        foreach ($consultas as $key => $value) {
+            $value->id = $key;
+            //$value->nom_doctor = $doctor[0]->nombres ." ". $doctor[0]->ap_pat ." ". $doctor[0]->ap_mat;
+            $value->nom_doctor = $doc[0]->APELLIDOS_NOMBRES;
+        }
 
         return json_encode($consultas);
         //return response()->json(['success' => true, 'consultas' => $consultas], 200);
@@ -166,6 +173,7 @@ class UserController extends Controller{
         try {
             $consultas = DB::table('consultas')->where('id_doctor',$doctor)->get()->toArray();
             $bonos = DB::table('bonos')->where('id_doctor',$doctor)->get()->toArray();
+            $doc = DB::table('doctores')->where('id_doctor',$doctor)->get();
             //$response['data']=$data;
             //$response['message']='Load successfull';
             //$response['success']= true;
@@ -183,6 +191,12 @@ class UserController extends Controller{
             };
         }
         usort($data, object_sorter('fecha_atencion'));
+
+        foreach ($data as $key => $value) {
+            $value->id = $key;
+            //$value->nom_doctor = $doctor[0]->nombres ." ". $doctor[0]->ap_pat ." ". $doctor[0]->ap_mat;
+            $value->nombre_medico = $doc[0]->APELLIDOS_NOMBRES;
+        }
 
         //print_r($data);
         return json_encode($data);
@@ -305,7 +319,7 @@ class UserController extends Controller{
         foreach ($data as $key => $value) {
             $value->id = $key;
             //$value->nom_doctor = $doctor[0]->nombres ." ". $doctor[0]->ap_pat ." ". $doctor[0]->ap_mat;
-            $value->nom_doctor = $doctor[0]->APELLIDOS_NOMBRES;
+            $value->nombre_medico = $doctor[0]->APELLIDOS_NOMBRES;
         }
         return json_encode($data);
     }
@@ -440,9 +454,24 @@ class UserController extends Controller{
         try {
             $data = DB::table('facturas')
                     ->where('ruc',$ruc)->get()->toArray();
-
+            $doctor = DB::table('doctores')->where('RUC',$ruc)->get();
         } catch (\Exception $e) {
 
+        }
+
+        function object_sorter($clave,$orden=null) {
+            return function ($a, $b) use ($clave,$orden) {
+                  $result=  ($orden=="DESC") ? strnatcmp($b->$clave, $a->$clave) :  strnatcmp($a->$clave, $b->$clave);
+                  return $result;
+            };
+        }
+        usort($data, object_sorter('fec_emision',"DESC"));
+
+
+        foreach ($data as $key => $value) {
+            $value->id = $key;
+            //$value->nom_doctor = $doctor[0]->nombres ." ". $doctor[0]->ap_pat ." ". $doctor[0]->ap_mat;
+            $value->nom_doctor = $doctor[0]->APELLIDOS_NOMBRES;
         }
         //echo(gettype($cita));
         //return json_encode($cantidades);
