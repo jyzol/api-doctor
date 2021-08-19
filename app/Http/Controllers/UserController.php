@@ -40,21 +40,29 @@ class UserController extends Controller{
         $affected = DB::table('usuarios')->where('nom_usuario', $username)->update(['clave' => $gen_pass]);
 
         if(!empty($affected)){
-            $sid    = env('TWILIO_SID');
-            $token  = env('TWILIO_TOKEN'); 
-            $twilio = new Client($sid, $token); 
- 
-            $message = $twilio->messages 
-                            ->create("+51{$phonenumber}", // to 
-                                array(  
-                                    "messagingServiceSid" => env('TWILIO_MSID'),      
-                                "body" => "Clave de acceso para {$username}: {$gen_pass}"
-                            )
-                        );
-            print($message->sid);
-            print($phonenumber);
             $usr = DB::table('usuarios')->where('nom_usuario',$username)->first();
-            echo json_encode($usr);
+            if(!empty($phonenumber)){
+                $sid    = env('TWILIO_SID');
+                $token  = env('TWILIO_TOKEN'); 
+                $twilio = new Client($sid, $token); 
+
+                $message = $twilio->messages 
+                                ->create("+51{$phonenumber}", // to 
+                                    array(  
+                                        "messagingServiceSid" => env('TWILIO_MSID'),      
+                                    "body" => "Clave de acceso para {$username}: {$gen_pass}"
+                                )
+                            );
+                print($message->sid);
+                print("\n");
+                print($phonenumber);
+                print("\n");
+                echo $usr->clave;
+            }else{
+                echo $usr->clave;
+            }
+            
+            //echo json_encode($usr);
         }else{
             echo "error";
         }
@@ -79,21 +87,31 @@ class UserController extends Controller{
 
     function registrar(Request $req){
         $nombres =  $req->input('nombres');
-        $appat = $req->input('appat');
-        $apmat = $req->input('apmat');
+        //$appat = $req->input('appat');
+        //$apmat = $req->input('apmat');
         $dni = $req->input('dni');
         $correo = $req->input('correo');
         $telefono = $req->input('telefono');
         $direccion = $req->input('direccion');
-        $especialidad = $req->input('especialidad');
+        //$especialidad = $req->input('especialidad');
         $ruc = $req->input('ruc');
-        $clavesol = $req->input('clavesol');
-        $solpass = $req->input('solpass');
-        $usuario = $req->input('usuario');
-        $pass = $req->input('pass');
+        $usrsunat = $req->input('usrsunat');
+        $clavesunat = $req->input('clavesunat');
+        //$usuario = $req->input('usuario');
+        //$pass = $req->input('pass');
 
         try {
-            $id = DB::table('doctores')->insertGetId([
+            $affected = DB::table('doctores')
+                        ->where('DNI', $dni)            
+                        ->update([
+                            'CORREO' => $correo,
+                            'TELEFONO' => $telefono,
+                            'DIRECCION' => $direccion,
+                            'RUC' => $ruc,
+                            'USUARIO_SUNAT' => $usrsunat,
+                            'CLAVE_SUNAT' => $clavesunat
+                        ]);
+            /*$id = DB::table('doctores')->insertGetId([
                 'nombres' => $nombres,
                 'ap_pat' => $appat,
                 'ap_mat' => $apmat,
@@ -105,19 +123,22 @@ class UserController extends Controller{
                 'ruc' => $ruc,
                 'clave_sol' => $clavesol,
                 'pass_sol' => $solpass
-            ]);
+            ]);*/
 
-            DB::table('usuarios')->insert([
+            /*DB::table('usuarios')->insert([
                 'id_doctor' => $id,
                 'tipo_usuario' => 'personal',
                 'nom_usuario' => $usuario,
                 'clave' => $pass
-            ]);
+            ]);*/
         } catch (\Exception $e) {
-            
+            echo "Error";
         }
-
-        echo 'Éxito';
+        if(!empty($affected)){
+            echo $affected;
+        }else{
+            echo "Error";
+        }
     }
 
     function actruc(Request $req){
