@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\ExcelController;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,3 +31,5 @@ Route::get('/filtros',[UserController::class,'listConsultaFiltros']);
 Route::post('/registrofact',[UserController::class,'registroFactura']);
 Route::get('/montos',[UserController::class,'listMontos']);
 Route::get('/facturas',[UserController::class,'listFacturas']);
+
+Route::get('/cargarexcel',[ExcelController::class,'cargarExcel']);
